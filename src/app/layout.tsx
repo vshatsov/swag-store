@@ -1,16 +1,15 @@
+/** @format */
+
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Image from "next/image";
+import Link from "next/link";
+import LayoutNavigation from "./layout-navigation";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,9 +24,42 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${GeistMono.className} ${GeistSans.className} antialiased min-h-screen flex flex-col h-full`}
       >
-        {children}
+        <div className="flex min-h-screen h-full flex-col">
+          <header className="border-b bg-white h-16 w-full px-2 flex justify-between items-center">
+            <div className="flex items-center gap-8">
+              <Link href={"/"} className="flex gap-4 items-center">
+                <Image
+                  className="invert"
+                  src="vercel.svg"
+                  alt="Vercel Swag Store Logo"
+                  width={25}
+                  height={25}
+                  priority
+                />
+                <h2 className="text-l font-semibold">Swag Store</h2>
+              </Link>
+              <Suspense
+                fallback={<div className="h-8 w-24 bg-gray-200 rounded" />}
+              >
+                <LayoutNavigation />
+              </Suspense>
+            </div>
+            {/* placeholder for cart */}
+            <div>cart</div>
+          </header>
+
+          <main className="flex flex-1">{children}</main>
+
+          <footer className="border-t bg-white mt-2">
+            <div className="w-full max-w-7xl px-2 py-4 text-sm text-gray-500 h-16">
+              © 2026 Vercel Swag Store by Vitali Shatsou
+            </div>
+          </footer>
+        </div>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
