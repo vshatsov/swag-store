@@ -10,6 +10,8 @@ import Image from "next/image";
 import Link from "next/link";
 import LayoutNavigation from "./layout-navigation";
 import { Suspense } from "react";
+import { Cart, CartSkeleton } from "./cart";
+import { ShoppingBasket } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -46,8 +48,9 @@ export default function RootLayout({
                 <LayoutNavigation />
               </Suspense>
             </div>
-            {/* placeholder for cart */}
-            <div>cart</div>
+            <Suspense fallback={<CartSkeleton />}>
+              <Cart />
+            </Suspense>
           </header>
 
           <main className="flex flex-1">{children}</main>

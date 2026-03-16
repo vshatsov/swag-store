@@ -43,7 +43,6 @@ export async function FeaturedProducts() {
           opts={{
             align: "start",
           }}
-          className="px-8"
         >
           <CarouselContent className="p-2">
             {products.data?.length != 0 &&
