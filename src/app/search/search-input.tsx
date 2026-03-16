@@ -10,7 +10,7 @@ export function SearchInput() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const triggerSearch = (value: string) => {
+  const triggerSearch = useDebouncedCallback((value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (!value) {
       params.delete("search");
@@ -20,14 +20,11 @@ export function SearchInput() {
     if (value.length >= 3 || value.length === 0) {
       router.replace(`?${params.toString()}`);
     }
-  };
+  }, 500);
 
-  const handleSearchChange = useDebouncedCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      return triggerSearch(e.target.value);
-    },
-    300,
-  );
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    return triggerSearch(e.target.value);
+  };
 
   // should submit search on enter
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

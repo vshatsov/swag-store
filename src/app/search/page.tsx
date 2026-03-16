@@ -20,19 +20,30 @@ export default async function Search({
 }: {
   searchParams: Promise<{ search?: string; category?: string }>;
 }) {
-  const { search, category: categoryString } = await searchParams;
-  const category = categoryString as ListProductsCategoryEnum;
-  const categoriesResponse = await getAvailableCategories();
+  const [searchParamsResult, availableCategoriesResult] =
+    await Promise.allSettled([searchParams, getAvailableCategories()]);
+  const { search, category: categoryString } =
+    searchParamsResult.status === "fulfilled"
+      ? searchParamsResult.value
+      : { search: undefined, category: undefined };
+  const category = categoryString as ListProductsCategoryEnum | undefined;
+  const categoriesResponse =
+    availableCategoriesResult.status === "fulfilled"
+      ? availableCategoriesResult.value
+      : { data: undefined };
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-6">Search Products</h1>
       </div>
-      <div className="flex gap-4">
+      <div className="flex gap-4 mb-4">
         <SearchInput />
         <SearchFilter categories={categoriesResponse.data || []} />
       </div>
-      <Suspense key={`${search}-${categoryString}}`} fallback={<SearchContentSkeleton />}>
+      <Suspense
+        key={`${search}-${categoryString}}`}
+        fallback={<SearchContentSkeleton />}
+      >
         <SearchContent search={search || ""} category={category} />
       </Suspense>
     </div>

@@ -2,11 +2,17 @@
 
 import { ProductCard, ProductCardSkeleton } from "@/components/product-card";
 import { ListProductsCategoryEnum, productsApi } from "@/lib/api-client";
+import { cacheLife, cacheTag } from "next/cache";
 
 async function getProducts(
   search: string,
-  categorySlug: ListProductsCategoryEnum,
+  categorySlug?: ListProductsCategoryEnum,
 ) {
+  "use cache";
+  if (search === "" && !categorySlug) {
+    cacheLife("hours");
+    cacheTag(`products-all`);
+  }
   return productsApi.listProducts({
     search: search ? search : undefined,
     category: categorySlug,
@@ -19,7 +25,7 @@ export async function SearchContent({
   category,
 }: {
   search: string;
-  category: ListProductsCategoryEnum;
+  category?: ListProductsCategoryEnum;
 }) {
   const productsResponse = await getProducts(search, category);
   return (

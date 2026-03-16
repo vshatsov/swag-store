@@ -53,20 +53,22 @@ export function AddToCartClient({
     <div className="flex flex-col gap-4 h-28">
       <QuantitySelector liveStock={liveStock} />
       <div className="h-24">
-        {liveStock.inStock && (
-          <p className="text-sm text-green-500">In stock: {liveStock.stock} available</p>
+        {!disablePolling && liveStock.inStock && (
+          <p className="text-sm text-green-500">
+            In stock: {liveStock.stock} available
+          </p>
         )}
-        {!liveStock.inStock && (
+        {!disablePolling && !liveStock.inStock && (
           <p className="text-sm text-red-500">
             Out of stock. Please check back later.
           </p>
         )}
-        {liveStock.lowStock && (
+        {!disablePolling && liveStock.lowStock && (
           <p className="text-sm text-red-500">
             Hurry! Only a few items left in stock.
           </p>
         )}
-        {!!liveStock.lowStock && !liveStock.lowStock && (
+        {!disablePolling && !!liveStock.lowStock && !liveStock.lowStock && (
           <p className="text-sm text-red-500">
             Out of stock. Please check back later.
           </p>

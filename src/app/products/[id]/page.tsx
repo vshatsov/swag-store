@@ -40,7 +40,7 @@ export default async function ProductDetailsPage({
           className="object-contain"
           alt={`Product Details: ${productDetailsData?.slug}`}
           fill
-          preload
+          priority
           placeholder="empty"
         />
       </div>
