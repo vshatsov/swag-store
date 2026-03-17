@@ -58,7 +58,7 @@ export default async function ProductDetailsPage({
               ${productDetailsData?.price?.toFixed(2)}
             </p>
             <Suspense fallback={<AddToCartSkeleton />}>
-              <AddToCart productId={id} />
+              <AddToCart productId={id} product={productDetails.data} />
             </Suspense>
           </div>
           <div>

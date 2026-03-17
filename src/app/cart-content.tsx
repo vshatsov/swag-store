@@ -4,70 +4,35 @@
 
 import { DrawerDescription } from "@/components/ui/drawer";
 import { CartItemWithProduct, CartWithProducts } from "@/lib/api-client";
-import { useOptimistic, useTransition } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { MinusIcon, PlusIcon, Trash2Icon } from "lucide-react";
-import { updateCartItem } from "./update-cart-action";
+import { useCart } from "./cart-provider";
 
-interface CartContentProps {
-  cartData: CartWithProducts;
-}
 
-export function CartContent({ cartData }: CartContentProps) {
-  const [pending, startTransition] = useTransition();
-  const [optimisticCart, optimisticChangeProductQuantity] = useOptimistic(
-    cartData,
-    (
-      state: CartWithProducts,
-      { productId, quantity }: { productId: string; quantity: number },
-    ) => {
-      const updatedItems = (state.items || [])
-        .map((item) =>
-          item.productId === productId ? { ...item, quantity } : item,
-        )
-        .filter((item) => (item.quantity || 0) > 0) as CartItemWithProduct[];
-      return {
-        ...state,
-        items: updatedItems,
-        subtotal: updatedItems.reduce(
-          (sum: number, item: CartItemWithProduct) =>
-            sum + (item?.product?.price || 0) * (item.quantity || 0),
-          0,
-        ),
-      };
-    },
-  );
-
-  async function changeProductQuantity(args: {
-    productId: string;
-    quantity: number;
-  }) {
-    startTransition(async () => {
-      optimisticChangeProductQuantity(args);
-      await updateCartItem(args.productId, args.quantity);
-    });
-  }
+export function CartContent() {
+  const { optimisticCartData, updateQuantity } = useCart();
 
   return (
     <>
-      {optimisticCart?.items?.length === 0 ? (
+      {optimisticCartData?.items?.length === 0 ? (
         <DrawerDescription className="p-4">
           Your cart is empty.
         </DrawerDescription>
       ) : (
         <div className="p-4">
-          {optimisticCart?.items?.map((item) => (
+          {optimisticCartData?.items?.map((item) => (
             <CartItem
               key={item?.productId}
               item={item}
-              changeProductQuantity={changeProductQuantity}
+              changeProductQuantity={updateQuantity}
             />
           ))}
           <div className="flex justify-end mt-4">
             <p className="text-lg font-semibold">
-              Total: ${optimisticCart?.subtotal?.toFixed(2)}
+              Total: ${optimisticCartData?.subtotal?.toFixed(2)}
             </p>
           </div>
         </div>
@@ -90,14 +55,16 @@ function CartItem({
   return (
     <div key={item.productId} className="mb-4">
       <div className="relative h-12 w-full">
-        <Image
-          src={item.product?.images?.[0] || ""}
-          alt={`${item.product?.name}`}
-          fill
-          placeholder="empty"
-          className="object-contain"
-          quality={50}
-        />
+        {!!item.product?.images?.[0] && (
+          <Image
+            src={item.product?.images?.[0]}
+            alt={`${item.product?.name}`}
+            fill
+            placeholder="empty"
+            className="object-contain"
+            quality={50}
+          />
+        )}
       </div>
       <div className="flex items-center justify-between mb-4">
         <div className="flex gap-2">

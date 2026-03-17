@@ -2,20 +2,18 @@
 
 "use client";
 import { MinusIcon, PlusIcon } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup, ButtonGroupText } from "@/components/ui/button-group";
-import { StockInfo } from "@/lib/api-client";
-import { addToCartAction } from "./add-to-cart-action";
+import { useCart } from "@/app/cart-provider";
+import { useStock } from "./stock-provider";
+import { Product } from "@/lib/api-client";
 
-interface QuantitySelectorProps {
-  liveStock: StockInfo;
-}
-
-export default function QuantitySelector({ liveStock }: QuantitySelectorProps) {
-  const stock = liveStock.stock || 0;
+export default function QuantitySelector({ product }: { product: Product }) {
+  const { stock: stockInfo } = useStock();
+  const stock = stockInfo?.stock || 0;
+  const { addToCart, pending } = useCart();
   const [quantity, setQuantity] = useState(stock === 0 ? 0 : 1);
-  const [pending, startTransition] = useTransition();
   return (
     <div className="flex w-full flex-col gap-4 h-24">
       <div className="flex gap-4 w-full">
@@ -29,11 +27,11 @@ export default function QuantitySelector({ liveStock }: QuantitySelectorProps) {
             <MinusIcon />
           </Button>
           <ButtonGroupText className="min-w-12 justify-center">
-            {!!liveStock.productId && quantity}
+            {!!stockInfo?.productId && quantity}
           </ButtonGroupText>
           <Button
             onClick={() => setQuantity(quantity + 1)}
-            disabled={pending || (!!liveStock.productId && quantity >= stock)}
+            disabled={pending || (!!stockInfo?.productId && quantity >= stock)}
             size="lg"
             variant="outline"
           >
@@ -43,14 +41,18 @@ export default function QuantitySelector({ liveStock }: QuantitySelectorProps) {
         <Button
           className="flex-2"
           size="lg"
-          onClick={() =>
-            startTransition(async () => {
-              await addToCartAction(liveStock.productId || "", quantity);
-              setQuantity(1); // reset quantity to 1 after adding to cart
-            })
-          }
+          onClick={async () => {
+            await addToCart(
+              {
+                productId: stockInfo?.productId || "",
+                quantity,
+              },
+              product,
+            );
+            setQuantity(1); // reset quantity to 1 after adding to cart
+          }}
           disabled={
-            pending || quantity === 0 || !liveStock.inStock || quantity > stock
+            pending || quantity === 0 || !stockInfo?.inStock || quantity > stock
           }
         >
           {quantity > stock

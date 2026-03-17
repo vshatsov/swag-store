@@ -12,6 +12,7 @@ import LayoutNavigation from "./layout-navigation";
 import { Suspense } from "react";
 import { Cart, CartSkeleton } from "./cart";
 import { ShoppingBasket } from "lucide-react";
+import { CartProvider } from "./cart-provider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -28,39 +29,41 @@ export default function RootLayout({
       <body
         className={`${GeistMono.className} ${GeistSans.className} antialiased min-h-screen flex flex-col h-full`}
       >
-        <div className="flex min-h-screen h-full flex-col">
-          <header className="border-b bg-white h-16 w-full px-2 flex justify-between items-center">
-            <div className="flex items-center gap-8">
-              <Link href={"/"} className="flex gap-4 items-center">
-                <Image
-                  className="invert"
-                  src="vercel.svg"
-                  alt="Vercel Swag Store Logo"
-                  width={25}
-                  height={25}
-                  priority
-                />
-                <h2 className="text-l font-semibold">Swag Store</h2>
-              </Link>
-              <Suspense
-                fallback={<div className="h-8 w-24 bg-gray-200 rounded" />}
-              >
-                <LayoutNavigation />
+        <CartProvider>
+          <div className="flex min-h-screen h-full flex-col">
+            <header className="border-b bg-white h-16 w-full px-2 flex justify-between items-center">
+              <div className="flex items-center gap-8">
+                <Link href={"/"} className="flex gap-4 items-center">
+                  <Image
+                    className="invert"
+                    src="vercel.svg"
+                    alt="Vercel Swag Store Logo"
+                    width={25}
+                    height={25}
+                    priority
+                  />
+                  <h2 className="text-l font-semibold">Swag Store</h2>
+                </Link>
+                <Suspense
+                  fallback={<div className="h-8 w-24 bg-gray-200 rounded" />}
+                >
+                  <LayoutNavigation />
+                </Suspense>
+              </div>
+              <Suspense fallback={<CartSkeleton />}>
+                <Cart />
               </Suspense>
-            </div>
-            <Suspense fallback={<CartSkeleton />}>
-              <Cart />
-            </Suspense>
-          </header>
+            </header>
 
-          <main className="flex flex-1">{children}</main>
+            <main className="flex flex-1">{children}</main>
 
-          <footer className="border-t bg-white mt-2">
-            <div className="w-full max-w-7xl px-2 py-4 text-sm text-gray-500 h-16">
-              © 2026 Vercel Swag Store by Vitali Shatsou
-            </div>
-          </footer>
-        </div>
+            <footer className="border-t bg-white mt-2">
+              <div className="w-full max-w-7xl px-2 py-4 text-sm text-gray-500 h-16">
+                © 2026 Vercel Swag Store by Vitali Shatsou
+              </div>
+            </footer>
+          </div>
+        </CartProvider>
         <Analytics />
         <SpeedInsights />
       </body>

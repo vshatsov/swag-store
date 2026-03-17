@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { CartContent } from "./cart-content";
+import { CartInitClient } from "./cart-init-client";
+import { GoToCheckout } from "./go-to-checkout";
 
 export async function Cart() {
   const cookieStore = await cookies();
@@ -30,35 +32,40 @@ export async function Cart() {
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <Drawer direction="right">
-        <DrawerTrigger asChild>
-          <div className="relative p-2 rounded-md cursor-pointer">
-            <ShoppingBasket className="h-5 w-5" />
-            {data?.totalItems || 0 > 0 ? (
-              <Badge
-                className="absolute -top-1 -right-1 h-4 w-4 rounded-full px-0 text-[10px] leading-none"
-                variant="destructive"
-              >
-                {data.totalItems}
-              </Badge>
-            ) : null}
-          </div>
-        </DrawerTrigger>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>See your order:</DrawerTitle>
-          </DrawerHeader>
-          <CartContent cartData={data} />
-          <DrawerFooter>
-            <Button>Go to checkout</Button>
-            <DrawerClose asChild>
-              <Button variant="outline">Close</Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
-    </div>
+    <>
+      <div key={data.updatedAt?.toString()}>
+        <CartInitClient cartData={data} />
+      </div>
+      <div className="flex items-center gap-2">
+        <Drawer direction="right">
+          <DrawerTrigger asChild>
+            <div className="relative p-2 rounded-md cursor-pointer">
+              <ShoppingBasket className="h-5 w-5" />
+              {data?.totalItems || 0 > 0 ? (
+                <Badge
+                  className="absolute -top-1 -right-1 h-4 w-4 rounded-full px-0 text-[10px] leading-none"
+                  variant="destructive"
+                >
+                  {data.totalItems}
+                </Badge>
+              ) : null}
+            </div>
+          </DrawerTrigger>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>See your order:</DrawerTitle>
+            </DrawerHeader>
+            <CartContent />
+            <DrawerFooter>
+              <GoToCheckout />
+              <DrawerClose asChild>
+                <Button variant="outline">Close</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      </div>
+    </>
   );
 }
 
