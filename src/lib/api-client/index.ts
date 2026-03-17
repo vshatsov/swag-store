@@ -7,6 +7,7 @@ import {
   StockApi,
   CartApi,
   CategoriesApi,
+  StoreApi,
 } from "./generated-api";
 
 const bypass = process.env.X_VERCEL_PROTECTION_BYPASS;
@@ -22,5 +23,6 @@ export const productsApi = new ProductsApi(config);
 export const stockApi = new StockApi(config);
 export const cartApi = new CartApi(config);
 export const categoriesApi = new CategoriesApi(config);
+export const storeApi = new StoreApi(config);
 
 export * from "./generated-api";

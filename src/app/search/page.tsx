@@ -1,5 +1,6 @@
 /** @format */
 
+import type { Metadata } from "next";
 import { categoriesApi, ListProductsCategoryEnum } from "@/lib/api-client";
 import { cacheLife, cacheTag } from "next/cache";
 import { SearchFilter } from "./search-filter";
@@ -13,6 +14,67 @@ async function getAvailableCategories() {
   cacheTag("categories");
   const categoriesResponse = await categoriesApi.listCategories();
   return categoriesResponse;
+}
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string; category?: string }>;
+}): Promise<Metadata> {
+  try {
+    const { search, category } = await searchParams;
+
+    const titleParts: string[] = ["Search Products"];
+    const descriptionParts: string[] = [];
+
+    if (search) {
+      titleParts.push(`"${search}"`);
+      descriptionParts.push(`Results for "${search}"`);
+    }
+
+    if (category) {
+      titleParts.push(`in ${category}`);
+      descriptionParts.push(`in the ${category} category`);
+    }
+
+    const title = titleParts.join(" ");
+    const description =
+      descriptionParts.length > 0
+        ? `Browse and filter ${descriptionParts.join(" ")} at our exclusive swag store.`
+        : "Search and discover premium branded merchandise at our exclusive swag store.";
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        type: "website",
+        url: `https://swag-store-gray.vercel.app/search${
+          search || category
+            ? `?${[
+                search ? `search=${encodeURIComponent(search)}` : "",
+                category ? `category=${encodeURIComponent(category)}` : "",
+              ]
+                .filter(Boolean)
+                .join("&")}`
+            : ""
+        }`,
+      },
+      twitter: {
+        card: "summary",
+        title,
+        description,
+      },
+    };
+  } catch (error) {
+    console.error("Failed to generate search metadata:", error);
+    return {
+      title: "Search Products",
+      description:
+        "Search and discover premium branded merchandise at our exclusive swag store.",
+    };
+  }
 }
 
 export default async function Search({

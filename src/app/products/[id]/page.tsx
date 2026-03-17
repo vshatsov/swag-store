@@ -1,5 +1,6 @@
 /** @format */
 
+import type { Metadata } from "next";
 import { productsApi } from "@/lib/api-client";
 import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
@@ -16,6 +17,55 @@ async function getProductDetails(id: string) {
   const productDetailsResponse = await productsApi.getProduct({ id });
 
   return productDetailsResponse;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+
+  try {
+    const productDetails = await getProductDetails(id);
+
+    if (!productDetails.data) {
+      return {
+        title: "Product Not Found",
+        description: "The product you're looking for could not be found.",
+      };
+    }
+
+    const product = productDetails.data;
+    const productName = product?.name || "Product";
+    const productDescription =
+      product?.description ||
+      "Discover this exclusive product from our swag store.";
+    const productImage = product?.images?.[0] || "";
+
+    return {
+      title: productName,
+      description: productDescription,
+      openGraph: {
+        title: productName,
+        description: productDescription,
+        url: `https://swag-store-gray.vercel.app/products/${id}`,
+        images: productImage ? [{ url: productImage, alt: productName }] : [],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: productName,
+        description: productDescription,
+        images: productImage ? [productImage] : [],
+      },
+    };
+  } catch (error) {
+    console.error("Failed to fetch product details for metadata:", error);
+    return {
+      title: "Product Details",
+      description: "View product details from our swag store.",
+    };
+  }
 }
 
 export default async function ProductDetailsPage({

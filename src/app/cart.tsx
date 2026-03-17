@@ -21,7 +21,7 @@ import { GoToCheckout } from "./go-to-checkout";
 export async function Cart() {
   const cookieStore = await cookies();
   const token = cookieStore.get("x-cart-token")?.value;
-  let data: CartWithProducts = { items: [] };
+  let data: CartWithProducts = { items: [], updatedAt: new Date() };
   if (token) {
     const { data: cartData } = await cartApi.getCart({
       xCartToken: token || "",
