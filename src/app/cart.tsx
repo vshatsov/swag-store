@@ -23,11 +23,15 @@ export async function Cart() {
   const token = cookieStore.get("x-cart-token")?.value;
   let data: CartWithProducts = { items: [], updatedAt: new Date() };
   if (token) {
-    const { data: cartData } = await cartApi.getCart({
-      xCartToken: token || "",
-    });
-    if (cartData) {
-      data = cartData;
+    try {
+      const { data: cartData } = await cartApi.getCart({
+        xCartToken: token || "",
+      });
+      if (cartData) {
+        data = cartData;
+      }
+    } catch (e) {
+      data = { items: [], updatedAt: new Date() };
     }
   }
 

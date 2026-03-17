@@ -13,7 +13,6 @@ interface CartInitClientProps {
 export function CartInitClient({ cartData }: CartInitClientProps) {
   const { updateCartData } = useCart();
   useEffect(() => {
-    console.log("cartData.items", cartData.items);
     updateCartData(cartData);
   }, []);
 
