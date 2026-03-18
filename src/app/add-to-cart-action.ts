@@ -20,7 +20,7 @@ export async function addToCartAction(productId: string, quantity: number) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 30, // 30 days
+      maxAge: 60 * 60 * 24, // 1 day
     });
 
     token = cartWithProducts.token;

@@ -131,3 +131,4 @@ export function useCart(): CartContextType {
 }
 
 // TODO what if we updated cart during optimistic update - handle that case
+// TODO implement queue for actions triggered fast
