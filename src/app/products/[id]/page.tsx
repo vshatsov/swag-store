@@ -6,8 +6,9 @@ import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { AddToCart, AddToCartSkeleton } from "./add-to-cart";
+import { AddToCart, AddToCartSkeleton } from "./_add-to-cart/add-to-cart";
 import { Suspense } from "react";
+import { centsToDollarsString } from "@/lib/utils";
 
 async function getProductDetails(id: string) {
   "use cache";
@@ -105,7 +106,7 @@ export default async function ProductDetailsPage({
             </div>
             <p>{productDetailsData?.description}</p>
             <p className="text-secondary">
-              ${productDetailsData?.price?.toFixed(2)}
+              {centsToDollarsString(productDetailsData?.price || 0)} $
             </p>
             <Suspense fallback={<AddToCartSkeleton />}>
               <AddToCart productId={id} product={productDetails.data} />

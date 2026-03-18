@@ -14,6 +14,7 @@ export function CartInitClient({ cartData }: CartInitClientProps) {
   const { updateCartData } = useCart();
   useEffect(() => {
     updateCartData(cartData);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return null;

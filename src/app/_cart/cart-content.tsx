@@ -3,14 +3,13 @@
 "use client";
 
 import { DrawerDescription } from "@/components/ui/drawer";
-import { CartItemWithProduct, CartWithProducts } from "@/lib/api-client";
-import { useEffect } from "react";
+import { CartItemWithProduct } from "@/lib/api-client";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { MinusIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useCart } from "./cart-provider";
-
+import { centsToDollarsString } from "@/lib/utils";
 
 export function CartContent() {
   const { optimisticCartData, updateQuantity } = useCart();
@@ -32,7 +31,7 @@ export function CartContent() {
           ))}
           <div className="flex justify-end mt-4">
             <p className="text-lg font-semibold">
-              Total: ${optimisticCartData?.subtotal?.toFixed(2)}
+              Total: {centsToDollarsString(optimisticCartData?.subtotal || 0)} $
             </p>
           </div>
         </div>
@@ -114,7 +113,9 @@ function CartItem({
             </div>
           </div>
         </div>
-        <p className="font-medium">${item.product?.price?.toFixed(2)}</p>
+        <p className="font-medium">
+          {centsToDollarsString(item.product?.price || 0)}$
+        </p>
       </div>
     </div>
   );

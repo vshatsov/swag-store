@@ -121,3 +121,11 @@ export function accumulateDebounce<T, K>(
 
   return debounced;
 }
+
+export function centsToDollarsString(cents: number) {
+  const dollars = cents / 100;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(dollars);
+}

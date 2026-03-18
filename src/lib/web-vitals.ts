@@ -1,3 +1,5 @@
+/** @format */
+
 import { onCLS, onINP, onLCP } from "web-vitals";
 
 export function registerWebVitals() {
@@ -17,7 +19,12 @@ export function registerWebVitals() {
   });
 }
 
-function sendToAnalytics(metric: any) {
+function sendToAnalytics(metric: {
+  id: string;
+  name: string;
+  value: number;
+  rating: string;
+}) {
   const { id, name, value, rating } = metric;
 
   // Send to your analytics endpoint

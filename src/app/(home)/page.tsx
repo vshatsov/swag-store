@@ -1,7 +1,6 @@
 /** @format */
 
 import type { Metadata } from "next";
-import Image from "next/image";
 import { HeroSection } from "./hero-section";
 import { PromoBanner, PromoBannerSkeleton } from "./promo-banner";
 import {

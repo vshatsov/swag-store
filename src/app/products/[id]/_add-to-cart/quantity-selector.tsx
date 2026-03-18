@@ -5,7 +5,7 @@ import { MinusIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup, ButtonGroupText } from "@/components/ui/button-group";
-import { useCart } from "@/app/cart-provider";
+import { useCart } from "@/app/_cart/cart-provider";
 import { useStock } from "./stock-provider";
 import { Product } from "@/lib/api-client";
 

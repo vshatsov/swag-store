@@ -10,8 +10,8 @@ import Image from "next/image";
 import Link from "next/link";
 import LayoutNavigation from "./layout-navigation";
 import { Suspense } from "react";
-import { Cart, CartSkeleton } from "./cart";
-import { CartProvider } from "./cart-provider";
+import { Cart, CartSkeleton } from "./_cart/cart";
+import { CartProvider } from "./_cart/cart-provider";
 import { storeApi } from "@/lib/api-client";
 
 export async function generateMetadata(): Promise<Metadata> {

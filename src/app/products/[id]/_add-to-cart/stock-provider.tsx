@@ -11,6 +11,7 @@ import {
   Dispatch,
   SetStateAction,
   useEffect,
+  useRef,
 } from "react";
 
 interface StockContextType {
@@ -38,9 +39,13 @@ const POLLING_INTERVAL = 5000;
 export function StockProvider({ children, initialStock }: StockProviderProps) {
   const [stock, setStock] = useState<StockInfo | null>(initialStock || null);
   const [isLoading, setIsLoading] = useState(false);
+  const refInterval = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const intervalId = setInterval(async () => {
+    if (refInterval.current) {
+      clearInterval(refInterval.current);
+    }
+    refInterval.current = setInterval(async () => {
       try {
         const json = await fetchLiveStock(initialStock?.productId || "");
         if (json?.data) {
@@ -52,9 +57,11 @@ export function StockProvider({ children, initialStock }: StockProviderProps) {
     }, POLLING_INTERVAL);
 
     return () => {
-      clearInterval(intervalId);
+      if (refInterval.current) {
+        clearInterval(refInterval.current);
+      }
     };
-  }, []);
+  }, [initialStock?.productId]);
   return (
     <StockContext.Provider value={{ stock, setStock, isLoading, setIsLoading }}>
       {children}

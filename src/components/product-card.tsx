@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
+import { centsToDollarsString } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -35,7 +36,7 @@ export async function ProductCard({ product }: ProductCardProps) {
         </Button>
       </CardHeader>
       <CardContent className="text-secondary">
-        ${product.price?.toFixed(2)}
+        {centsToDollarsString(product.price || 0)}
       </CardContent>
     </Card>
   );
