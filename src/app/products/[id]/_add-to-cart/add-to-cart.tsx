@@ -2,7 +2,7 @@
 
 import { Product, stockApi } from "@/lib/api-client";
 import { cacheLife, cacheTag } from "next/cache";
-import { StockProvider } from "./stock-provider";
+import { StockProvider } from "../stock-provider";
 import QuantitySelector from "./quantity-selector";
 import { Stock } from "./stock";
 

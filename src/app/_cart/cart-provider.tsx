@@ -2,11 +2,7 @@
 
 "use client";
 
-import {
-  CartWithProducts,
-  CartItemWithProduct,
-  Product,
-} from "@/lib/api-client";
+import { CartItemWithProduct, CartWithProducts } from "@/lib/api-client";
 import {
   createContext,
   useContext,
@@ -14,27 +10,19 @@ import {
   useTransition,
   useOptimistic,
   useState,
+  useMemo,
 } from "react";
 import { updateCartItem } from "./update-cart-action";
 import { addToCartAction } from "./add-to-cart-action";
-
-interface UpdateCartItemBody {
-  productId: string;
-  quantity: number;
-}
+import { accumulateDebounce } from "@/lib/utils";
 
 interface CartContextType {
   cartData: CartWithProducts | null;
   optimisticCartData: CartWithProducts | null;
   pending: boolean;
   updateCartData: (newCart: CartWithProducts) => void;
-  addToCart: (
-    updateCartItemBody: UpdateCartItemBody,
-    product: Product,
-  ) => void;
-  updateQuantity: (
-    updateCartItemBody: UpdateCartItemBody,
-  ) => void;
+  addToCart: (updateCartItemBody: CartItemWithProduct) => void;
+  updateQuantity: (updateCartItemBody: CartItemWithProduct) => void;
 }
 
 // Create context
@@ -49,38 +37,59 @@ export function CartProvider({ children }: { children: ReactNode }) {
     cartData,
     (
       state: CartWithProducts | null,
-      cartItemWithProductList: CartItemWithProduct[],
+      cartItemWithProduct: CartItemWithProduct,
     ) => {
       let newState = { ...state };
-      for (const { productId, quantity, product } of cartItemWithProductList) {
-        const items = state?.items || [];
-        const foundProduct = items.find((it) => it?.productId === productId);
-        if (!foundProduct) {
-          // temporary item
-          items.push({
-            productId,
-            quantity: 0,
-            product,
-          });
-        }
-        const updatedItems = items
-          .map((item) =>
-            item.productId === productId ? { ...item, quantity } : item,
-          )
-          .filter((item) => (item.quantity || 0) > 0) as CartItemWithProduct[];
-
-        newState = {
-          ...newState,
-          items: updatedItems,
-          subtotal: updatedItems.reduce(
-            (sum: number, item: CartItemWithProduct) =>
-              sum + (item?.product?.price || 0) * (item.quantity || 0),
-            0,
-          ),
-        };
+      const { productId, quantity, product } = cartItemWithProduct;
+      const items = state?.items || [];
+      const foundProduct = items.find((it) => it?.productId === productId);
+      if (!foundProduct) {
+        // temporary item
+        items.push({
+          productId,
+          quantity: 0,
+          product,
+        });
       }
+      const updatedItems = items
+        .map((item) =>
+          item.productId === productId ? { ...item, quantity } : item,
+        )
+        .filter((item) => (item.quantity || 0) > 0) as CartItemWithProduct[];
+
+      newState = {
+        ...newState,
+        items: updatedItems,
+        subtotal: updatedItems.reduce(
+          (sum: number, item: CartItemWithProduct) =>
+            sum + (item?.product?.price || 0) * (item.quantity || 0),
+          0,
+        ),
+      };
       return newState;
     },
+  );
+
+  const accumulatedUpdateCartItem = useMemo(
+    () =>
+      accumulateDebounce(
+        async (changes: { productId: string; quantity: number }[]) => {
+          const mapped = new Map<string, CartItemWithProduct>();
+          for (const change of changes) {
+            mapped.set(change.productId || "", change);
+          }
+          return Promise.allSettled(
+            mapped
+              .values()
+              .map((change) =>
+                updateCartItem(change.productId || "", change.quantity || 0),
+              ),
+          );
+        },
+        1500,
+        { leading: true },
+      ),
+    [],
   );
 
   const value: CartContextType = {
@@ -90,27 +99,35 @@ export function CartProvider({ children }: { children: ReactNode }) {
     updateCartData(newCartData) {
       setCartData(newCartData);
     },
-    async addToCart(args: UpdateCartItemBody, product: Product) {
+    async addToCart(cartItem: CartItemWithProduct) {
       return new Promise((resolve) => {
         startTransition(async () => {
           const existingAddedProduct = (cartData?.items || []).find(
-            (it) => it.productId === args.productId,
+            (it) => it.productId === cartItem.productId,
           );
-          let quantity = args.quantity;
+          let quantity = cartItem.quantity;
           if (existingAddedProduct) {
-            quantity = (existingAddedProduct.quantity || 0) + args.quantity;
+            quantity =
+              (existingAddedProduct.quantity || 0) + (cartItem?.quantity || 0);
           }
-          optimisticChangeProductQuantity([{ ...args, quantity, product }]);
-          await addToCartAction(args.productId, args.quantity);
+          optimisticChangeProductQuantity({ ...cartItem, quantity });
+          await addToCartAction(
+            cartItem?.productId || "",
+            cartItem.quantity || 0,
+          );
           resolve();
         });
       });
     },
-    async updateQuantity(args: UpdateCartItemBody) {
+    async updateQuantity(cartItem: CartItemWithProduct) {
       return new Promise((resolve) => {
         startTransition(async () => {
-          optimisticChangeProductQuantity([args]);
-          await updateCartItem(args.productId, args.quantity);
+          console.log("TESTTEST updateQuantity triggered", cartItem);
+          optimisticChangeProductQuantity(cartItem);
+          await accumulatedUpdateCartItem({
+            productId: cartItem.productId || "",
+            quantity: cartItem.quantity || 0,
+          });
           resolve();
         });
       });
@@ -128,6 +145,3 @@ export function useCart(): CartContextType {
   }
   return context;
 }
-
-// TODO what if we updated cart during optimistic update - handle that case
-// TODO implement queue for actions triggered fast

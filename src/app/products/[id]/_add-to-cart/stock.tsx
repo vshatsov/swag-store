@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useStock } from "./stock-provider";
+import { useStock } from "../stock-provider";
 
 
 interface StockProps {

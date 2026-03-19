@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup, ButtonGroupText } from "@/components/ui/button-group";
 import { useCart } from "@/app/_cart/cart-provider";
-import { useStock } from "./stock-provider";
+import { useStock } from "../stock-provider";
 import { Product } from "@/lib/api-client";
 
 export default function QuantitySelector({ product }: { product: Product }) {
@@ -42,13 +42,11 @@ export default function QuantitySelector({ product }: { product: Product }) {
           className="flex-2"
           size="lg"
           onClick={async () => {
-            await addToCart(
-              {
-                productId: stockInfo?.productId || "",
-                quantity,
-              },
+            await addToCart({
+              productId: stockInfo?.productId || "",
+              quantity,
               product,
-            );
+            });
             setQuantity(1); // reset quantity to 1 after adding to cart
           }}
           disabled={
