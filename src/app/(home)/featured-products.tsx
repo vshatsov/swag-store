@@ -9,22 +9,9 @@ import {
 } from "@/components/ui/carousel";
 import { ProductCard, ProductCardSkeleton } from "@/components/product-card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { productsApi } from "@/lib/api-client";
 import Link from "next/link";
 import { AnimateOnAppear } from "@/components/with-appear-animation";
-import { cacheLife, cacheTag } from "next/cache";
-
-async function getFeaturedProducts() {
-  "use cache";
-  cacheLife("minutes");
-  cacheTag("products");
-  cacheTag("featured-products");
-  const productsResponse = await productsApi.listProducts({
-    limit: 6,
-    featured: "true",
-  });
-  return productsResponse;
-}
+import { getFeaturedProducts } from "../_api/getFeaturedProducts";
 
 export async function FeaturedProducts() {
   // throw new Error('This error was triggered intentionally for testing')

@@ -1,24 +1,14 @@
 /** @format */
 
 import type { Metadata } from "next";
-import { productsApi } from "@/lib/api-client";
-import { cacheLife, cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { AddToCart, AddToCartSkeleton } from "./_add-to-cart/add-to-cart";
 import { Suspense } from "react";
 import { centsToDollarsString } from "@/lib/utils";
-
-async function getProductDetails(id: string) {
-  "use cache";
-  cacheLife("days");
-  cacheTag("products");
-  cacheTag(`product-details-${id}`);
-  const productDetailsResponse = await productsApi.getProduct({ id });
-
-  return productDetailsResponse;
-}
+import { getFeaturedProducts } from "@/app/_api/getFeaturedProducts";
+import { getProductDetails } from "@/app/_api/getProductDetails";
 
 export async function generateMetadata({
   params,
@@ -51,7 +41,6 @@ export async function generateMetadata({
         title: productName,
         description: productDescription,
         url: `https://swag-store-gray.vercel.app/products/${id}`,
-        images: productImage ? [{ url: productImage, alt: productName }] : [],
       },
       twitter: {
         card: "summary_large_image",
@@ -67,6 +56,15 @@ export async function generateMetadata({
       description: "View product details from our swag store.",
     };
   }
+}
+
+export async function generateStaticParams() {
+  const { data } = await getFeaturedProducts(); // Pre-render top featured products
+  const products = data || [];
+
+  return products.map((product) => ({
+    id: product.id,
+  }));
 }
 
 export default async function ProductDetailsPage({
