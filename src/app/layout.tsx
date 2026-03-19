@@ -13,6 +13,7 @@ import { Suspense } from "react";
 import { Cart, CartSkeleton } from "./_cart/cart";
 import { CartProvider } from "./_cart/cart-provider";
 import { storeApi } from "@/lib/api-client";
+import { Toaster } from "@/components/ui/sonner";
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
@@ -89,6 +90,7 @@ export default function RootLayout({
               </div>
             </footer>
           </div>
+          <Toaster />
         </CartProvider>
         <Analytics />
         <SpeedInsights />

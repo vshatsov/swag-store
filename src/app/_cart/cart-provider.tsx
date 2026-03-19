@@ -25,6 +25,10 @@ interface CartContextType {
   updateQuantity: (updateCartItemBody: CartItemWithProduct) => void;
 }
 
+interface AccumUpdateAction extends CartItemWithProduct {
+  accumulateActionType: "update" | "add";
+}
+
 // Create context
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -73,17 +77,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const accumulatedUpdateCartItem = useMemo(
     () =>
       accumulateDebounce(
-        async (changes: { productId: string; quantity: number }[]) => {
+        async (changes: AccumUpdateAction[]) => {
           const mapped = new Map<string, CartItemWithProduct>();
+          const mappedAdd = new Map<string, CartItemWithProduct>();
           for (const change of changes) {
-            mapped.set(change.productId || "", change);
+            if (change.accumulateActionType === "update") {
+              mapped.set(change.productId || "", change);
+            } else if (change.accumulateActionType === "add") {
+              const prevChange = mapped.get(change.productId || "");
+              if (prevChange) {
+                mapped.set(change.productId || "", {
+                  ...prevChange,
+                  quantity:
+                    (prevChange?.quantity || 0) + (change?.quantity || 0),
+                });
+              } else {
+                mappedAdd.set(change.productId || "", change);
+              }
+            }
           }
-          return Promise.allSettled(
-            mapped
+
+          await Promise.allSettled(
+            mappedAdd
               .values()
               .map((change) =>
-                updateCartItem(change.productId || "", change.quantity || 0),
+                addToCartAction(change.productId || "", change.quantity || 0),
               ),
+          );
+
+          return Promise.allSettled(
+            [...mapped.values()].map((change) =>
+              updateCartItem(change.productId || "", change.quantity || 0),
+            ),
           );
         },
         1500,
@@ -111,10 +136,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
               (existingAddedProduct.quantity || 0) + (cartItem?.quantity || 0);
           }
           optimisticChangeProductQuantity({ ...cartItem, quantity });
-          await addToCartAction(
-            cartItem?.productId || "",
-            cartItem.quantity || 0,
-          );
+          await accumulatedUpdateCartItem({
+            accumulateActionType: "add",
+            productId: cartItem?.productId || "",
+            quantity: cartItem?.quantity || 0,
+          });
           resolve();
         });
       });
@@ -122,9 +148,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     async updateQuantity(cartItem: CartItemWithProduct) {
       return new Promise((resolve) => {
         startTransition(async () => {
-          console.log("TESTTEST updateQuantity triggered", cartItem);
           optimisticChangeProductQuantity(cartItem);
           await accumulatedUpdateCartItem({
+            accumulateActionType: "update",
             productId: cartItem.productId || "",
             quantity: cartItem.quantity || 0,
           });

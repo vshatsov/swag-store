@@ -8,6 +8,7 @@ import { ButtonGroup, ButtonGroupText } from "@/components/ui/button-group";
 import { useCart } from "@/app/_cart/cart-provider";
 import { useStock } from "../stock-provider";
 import { Product } from "@/lib/api-client";
+import { toast } from "sonner";
 
 export default function QuantitySelector({ product }: { product: Product }) {
   const { stock: stockInfo } = useStock();
@@ -42,12 +43,21 @@ export default function QuantitySelector({ product }: { product: Product }) {
           className="flex-2"
           size="lg"
           onClick={async () => {
-            await addToCart({
-              productId: stockInfo?.productId || "",
-              quantity,
-              product,
-            });
-            setQuantity(1); // reset quantity to 1 after adding to cart
+            try {
+              await addToCart({
+                productId: stockInfo?.productId || "",
+                quantity,
+                product,
+              });
+              setQuantity(1); // reset quantity to 1 after adding to cart
+              toast(
+                `${product?.name} (${quantity}) was successfully added to your shopping cart!`,
+              );
+            } catch (error) {
+              toast.error(
+                `${product?.name} (${quantity}) failed! ${JSON.stringify(error)}`,
+              );
+            }
           }}
           disabled={
             pending || quantity === 0 || !stockInfo?.inStock || quantity > stock
