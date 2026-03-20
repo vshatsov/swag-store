@@ -12,20 +12,31 @@ import {
 } from "@/components/ui/combobox";
 import { Category } from "@/lib/api-client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-export function SearchFilter({ categories }: { categories: Category[] }) {
+export function SearchFilter({
+  categories,
+}: {
+  categories: Category[] | undefined;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialSelectedFilter = categories.find(
+  const initialSelectedFilter = (categories || []).find(
     (cat) => cat.slug === searchParams.get("category"),
   )?.slug;
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
     initialSelectedFilter || null,
   );
+  useEffect(() => {
+    if (!categories) {
+      toast.error("Failed to load categories!");
+    }
+  }, []);
+
   return (
     <Combobox
-      items={[{ slug: "all", name: "All Categories" }, ...categories]}
+      items={[{ slug: "all", name: "All Categories" }, ...(categories || [])]}
       defaultValue={initialSelectedFilter}
       value={selectedCategory}
       onValueChange={(value) => {

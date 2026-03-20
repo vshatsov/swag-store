@@ -17,23 +17,10 @@ import { Button } from "@/components/ui/button";
 import { CartContent } from "./cart-content";
 import { CartInitClient } from "./cart-init-client";
 import { GoToCheckout } from "./go-to-checkout";
+import { getCart } from "../_api/getCart";
 
 export async function Cart() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("x-cart-token")?.value;
-  let data: CartWithProducts = { items: [], updatedAt: new Date() };
-  if (token) {
-    try {
-      const { data: cartData } = await cartApi.getCart({
-        xCartToken: token || "",
-      });
-      if (cartData) {
-        data = cartData;
-      }
-    } catch (e) {
-      data = { items: [], updatedAt: new Date() };
-    }
-  }
+  const data = await getCart();
 
   return (
     <>

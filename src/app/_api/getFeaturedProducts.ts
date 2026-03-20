@@ -1,4 +1,5 @@
 /** @format */
+import "server-only";
 
 import { productsApi } from "@/lib/api-client";
 import { cacheLife, cacheTag } from "next/cache";

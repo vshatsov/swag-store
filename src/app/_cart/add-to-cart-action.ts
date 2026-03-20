@@ -2,37 +2,25 @@
 
 "use server";
 
-import { cookies } from "next/headers";
 import { cartApi } from "@/lib/api-client";
 import { refresh } from "next/cache";
+import { createOrGetCartToken } from "../_api/createOrGetCartToken";
+import { renewCartToken } from "../_api/renewCartToken";
 
 export async function addToCartAction(productId: string, quantity: number) {
-  const cookieStore = await cookies();
-  let token = cookieStore.get("x-cart-token")?.value;
+  const { token, cookieStore } = await createOrGetCartToken();
 
-  if (!token) {
-    const { data: cartWithProducts } = await cartApi.createCart();
-    if (!cartWithProducts?.token) {
-      throw new Error("Failed to create cart");
-    }
-    token = cartWithProducts.token;
+  if (token) {
+    await cartApi.addItemToCart({
+      xCartToken: token,
+      addToCartRequest: {
+        productId,
+        quantity,
+      },
+    });
+
+    await renewCartToken(token, cookieStore);
   }
-
-  cookieStore.set("x-cart-token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24, // 1 day
-  });
-
-  await cartApi.addItemToCart({
-    xCartToken: token,
-    addToCartRequest: {
-      productId,
-      quantity,
-    },
-  });
 
   refresh();
 }

@@ -100,7 +100,7 @@ export default async function Search({
       </div>
       <div className="flex gap-4 mb-4">
         <SearchInput />
-        <SearchFilter categories={categoriesResponse.data || []} />
+        <SearchFilter categories={categoriesResponse.data} />
       </div>
       <Suspense
         key={`${search}-${categoryString}}`}
