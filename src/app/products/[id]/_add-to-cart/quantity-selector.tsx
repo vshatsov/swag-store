@@ -9,18 +9,20 @@ import { useCart } from "@/app/_cart/cart-provider";
 import { useStock } from "../stock-provider";
 import { Product } from "@/lib/api-client";
 import { toast } from "sonner";
+import { withDelayedFallback } from "@/lib/utils";
 
 export default function QuantitySelector({ product }: { product: Product }) {
   const { stock: stockInfo } = useStock();
   const stock = stockInfo?.stock || 0;
-  const { addToCart, pending } = useCart();
+  const { addToCart } = useCart();
+  const [isOptimisticItemLoad, setIsOptimisticItemLoad] = useState(false);
   const [quantity, setQuantity] = useState(stock === 0 ? 0 : 1);
   return (
     <div className="flex w-full flex-col gap-4 h-24">
       <div className="flex gap-4 w-full">
         <ButtonGroup>
           <Button
-            disabled={pending || quantity === 0}
+            disabled={isOptimisticItemLoad || quantity === 0}
             onClick={() => setQuantity(Math.max(0, quantity - 1))}
             size="lg"
             variant="outline"
@@ -32,7 +34,10 @@ export default function QuantitySelector({ product }: { product: Product }) {
           </ButtonGroupText>
           <Button
             onClick={() => setQuantity(quantity + 1)}
-            disabled={pending || (!!stockInfo?.productId && quantity >= stock)}
+            disabled={
+              isOptimisticItemLoad ||
+              (!!stockInfo?.productId && quantity >= stock)
+            }
             size="lg"
             variant="outline"
           >
@@ -44,12 +49,23 @@ export default function QuantitySelector({ product }: { product: Product }) {
           size="lg"
           onClick={async () => {
             try {
-              await addToCart({
-                productId: stockInfo?.productId || "",
-                quantity,
-                product,
-              });
-              setQuantity(1); // reset quantity to 1 after adding to cart
+              setIsOptimisticItemLoad(true);
+              await withDelayedFallback(
+                async () => {
+                  await addToCart({
+                    productId: stockInfo?.productId || "",
+                    quantity,
+                    product,
+                  });
+                  setQuantity(1)
+                },
+                () => {
+                  setIsOptimisticItemLoad(false);
+                  setQuantity(1);
+                },
+                500,
+              );
+              setIsOptimisticItemLoad(false);
               toast(
                 `${product?.name} (${quantity}) was successfully added to your shopping cart!`,
               );
@@ -60,7 +76,10 @@ export default function QuantitySelector({ product }: { product: Product }) {
             }
           }}
           disabled={
-            pending || quantity === 0 || !stockInfo?.inStock || quantity > stock
+            isOptimisticItemLoad ||
+            quantity === 0 ||
+            !stockInfo?.inStock ||
+            quantity > stock
           }
         >
           {quantity > stock

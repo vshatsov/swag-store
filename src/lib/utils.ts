@@ -7,125 +7,163 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DebouncedFunction<T extends (...args: any[]) => any> = {
-  (...args: Parameters<T>): void;
-  cancel: () => void;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function debounce<T extends (...args: any[]) => any>(
-  fn: T,
-  delay: number,
-  options?: { leading?: boolean; trailing?: boolean },
-): DebouncedFunction<T> {
-  let timer: ReturnType<typeof setTimeout> | null = null;
-  let lastArgs: Parameters<T> | null = null;
-
-  const leading = options?.leading ?? false;
-  const trailing = options?.trailing ?? true;
-
-  const debounced = (...args: Parameters<T>) => {
-    const isFirstCall = !timer;
-
-    lastArgs = args;
-
-    if (timer) {
-      clearTimeout(timer);
-    }
-
-    if (leading && isFirstCall) {
-      fn(...args);
-    }
-
-    timer = setTimeout(() => {
-      if (trailing && (!leading || !isFirstCall)) {
-        if (lastArgs) {
-          fn(...lastArgs);
-        }
-      }
-
-      timer = null;
-      lastArgs = null;
-    }, delay);
-  };
-
-  debounced.cancel = () => {
-    if (timer) {
-      clearTimeout(timer);
-      timer = null;
-    }
-    lastArgs = null;
-  };
-
-  return debounced;
-}
-
-type AccumulatedFn<T> = {
-  (value: T): void;
-  flush: () => void;
-  cancel: () => void;
-};
-
-export function accumulateDebounce<T, K>(
-  fn: (items: T[]) => K,
-  delay: number,
-  options?: { leading?: boolean },
-): AccumulatedFn<T> {
-  let timer: ReturnType<typeof setTimeout> | null = null;
-  let queue: T[] = [];
-
-  const leading = options?.leading ?? false;
-
-  const flush = () => {
-    if (queue.length > 0) {
-      fn(queue);
-      queue = [];
-    }
-  };
-
-  const debounced = (value: T) => {
-    const isFirstCall = !timer;
-
-    queue.push(value);
-
-    if (leading && isFirstCall) {
-      flush();
-    }
-
-    if (timer) {
-      clearTimeout(timer);
-    }
-
-    timer = setTimeout(() => {
-      flush();
-      timer = null;
-    }, delay);
-  };
-
-  debounced.flush = () => {
-    if (timer) {
-      clearTimeout(timer);
-      timer = null;
-    }
-    flush();
-  };
-
-  debounced.cancel = () => {
-    if (timer) {
-      clearTimeout(timer);
-      timer = null;
-    }
-    queue = [];
-  };
-
-  return debounced;
-}
-
 export function centsToDollarsString(cents: number) {
   const dollars = cents / 100;
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
   }).format(dollars);
+}
+
+export type DebouncedRejectedError = Error & { code: "DEBOUNCED" };
+
+function createDebouncedError(
+  message = "Debounced by a newer call",
+): DebouncedRejectedError {
+  const error = new Error(message) as DebouncedRejectedError;
+  error.code = "DEBOUNCED";
+  return error;
+}
+
+type AsyncFn<TArgs extends unknown[], TResult> = (
+  ...args: TArgs
+) => Promise<TResult>;
+
+interface DebounceOptions {
+  leading?: boolean;
+}
+
+type DebouncedAsyncFn<TArgs extends unknown[], TResult> = ((
+  ...args: TArgs
+) => Promise<TResult>) & {
+  cancel: (reason?: Error) => void;
+  flush: () => Promise<TResult | undefined>;
+};
+
+export function debouncePromise<TArgs extends unknown[], TResult>(
+  fn: AsyncFn<TArgs, TResult>,
+  wait: number,
+  options: DebounceOptions = {},
+): DebouncedAsyncFn<TArgs, TResult> {
+  const { leading = false } = options;
+
+  let timer: ReturnType<typeof setTimeout> | null = null;
+
+  let lastArgs: TArgs | null = null;
+
+  let pendingResolve: ((value: TResult) => void) | null = null;
+  let pendingReject: ((reason?: unknown) => void) | null = null;
+
+  const invoke = async () => {
+    timer = null;
+
+    const args = lastArgs;
+    const resolve = pendingResolve;
+    const reject = pendingReject;
+
+    lastArgs = null;
+    pendingResolve = null;
+    pendingReject = null;
+
+    if (!args || !resolve || !reject) return;
+
+    try {
+      const result = await fn(...args);
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    }
+  };
+
+  const debounced = ((...args: TArgs) => {
+    const isFirstCall = !timer;
+
+    // If there's a pending call → reject it
+    if (pendingReject) {
+      pendingReject(createDebouncedError());
+      pendingReject = null;
+      pendingResolve = null;
+    }
+
+    // LEADING execution
+    if (leading && isFirstCall) {
+      // Start cooldown timer
+      timer = setTimeout(() => {
+        timer = null;
+      }, wait);
+
+      // Execute immediately
+      return fn(...args);
+    }
+
+    // TRAILING execution
+    lastArgs = args;
+
+    return new Promise<TResult>((resolve, reject) => {
+      pendingResolve = resolve;
+      pendingReject = reject;
+
+      if (timer) {
+        clearTimeout(timer);
+      }
+
+      timer = setTimeout(() => {
+        void invoke();
+      }, wait);
+    });
+  }) as DebouncedAsyncFn<TArgs, TResult>;
+
+  debounced.cancel = (reason = createDebouncedError("Debounce cancelled")) => {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+
+    if (pendingReject) {
+      pendingReject(reason);
+    }
+
+    lastArgs = null;
+    pendingResolve = null;
+    pendingReject = null;
+  };
+
+  debounced.flush = async () => {
+    if (!timer) return undefined;
+
+    clearTimeout(timer);
+    await invoke();
+    return undefined;
+  };
+
+  return debounced;
+}
+
+type DelayedFallbackAsyncFn<T> = () => Promise<T>;
+type FallbackFn = () => void;
+
+export async function withDelayedFallback<T>(
+  asyncFn: DelayedFallbackAsyncFn<T>,
+  fallbackFn: FallbackFn,
+  delay: number,
+): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined = undefined;
+
+  const promise = asyncFn();
+
+  const timerPromise = new Promise<void>((resolve) => {
+    timer = setTimeout(() => {
+      fallbackFn();
+      resolve();
+    }, delay);
+  });
+
+  // Wait whichever happens first
+  await Promise.race([promise, timerPromise]);
+
+  // If async finished first → cancel fallback
+  clearTimeout(timer);
+
+  // Always return async result
+  return promise;
 }

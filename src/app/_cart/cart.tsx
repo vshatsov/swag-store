@@ -1,9 +1,7 @@
 /** @format */
 
 import { ShoppingBasket } from "lucide-react";
-import { cookies } from "next/headers";
 import { Badge } from "@/components/ui/badge";
-import { cartApi, CartWithProducts } from "@/lib/api-client";
 import {
   Drawer,
   DrawerClose,
