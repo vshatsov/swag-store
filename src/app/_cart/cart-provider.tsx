@@ -59,6 +59,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       newState = {
         ...newState,
         items: updatedItems,
+        totalItems: updatedItems
+          ?.map((item) => item.quantity || 0)
+          .reduce((sum, value) => sum + value, 0),
         subtotal: updatedItems.reduce(
           (sum: number, item: CartItemWithProduct) =>
             sum + (item?.product?.price || 0) * (item.quantity || 0),

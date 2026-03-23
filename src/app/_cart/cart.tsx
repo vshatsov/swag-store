@@ -16,6 +16,7 @@ import { CartContent } from "./cart-content";
 import { CartInitClient } from "./cart-init-client";
 import { GoToCheckout } from "./go-to-checkout";
 import { getCart } from "../_api/getCart";
+import { CartBadge } from "./cart-badge";
 
 export async function Cart() {
   const data = await getCart();
@@ -30,14 +31,7 @@ export async function Cart() {
           <DrawerTrigger asChild>
             <div className="relative p-2 rounded-md cursor-pointer">
               <ShoppingBasket className="h-5 w-5" />
-              {data?.totalItems || 0 > 0 ? (
-                <Badge
-                  className="absolute -top-1 -right-1 h-4 w-4 rounded-full px-0 text-[10px] leading-none"
-                  variant="destructive"
-                >
-                  {data.totalItems}
-                </Badge>
-              ) : null}
+              <CartBadge />
             </div>
           </DrawerTrigger>
           <DrawerContent>

@@ -83,13 +83,14 @@ export default async function ProductDetailsPage({
 
   return (
     <div className="p-2 w-full grid md:grid-cols-[1fr_1fr]">
-      <div className="h-full relative">
+      <div className="h-full w-auto relative">
         <Image
           src={productDetailsData?.images?.[0] || ""}
           className="object-contain"
           alt={`Product Details: ${productDetailsData?.slug}`}
           fill
           priority
+          sizes="(max-width: 768px) 100vw, 50vw"
           placeholder="empty"
         />
       </div>

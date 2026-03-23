@@ -13,6 +13,7 @@ export async function HeroSection() {
           src="/vercel-hero-landscape-transparent.png"
           className="object-contain"
           alt="Vercel Hero"
+          sizes="(max-width: 768px) 100vw, 43vw"
           fill
           preload
         />
@@ -26,7 +27,7 @@ export async function HeroSection() {
           represent the tools you love!
         </p>
         <Button size="xxl" className="px-32 w-full md:w-fit" asChild>
-          <Link href="/search">
+          <Link href="/search" prefetch>
             Browse All Products <ArrowRight />
           </Link>
         </Button>

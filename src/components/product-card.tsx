@@ -23,7 +23,7 @@ export async function ProductCard({ product }: ProductCardProps) {
               alt={`${product?.name}`}
               className="object-contain"
               width={322}
-              height={105}
+              height={322}
               quality={80}
               placeholder="blur"
               // white base64 encoded 1x1 pixel image as blur placeholder

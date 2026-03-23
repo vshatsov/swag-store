@@ -61,14 +61,14 @@ export default function RootLayout({
             <header className="border-b bg-white h-16 w-full px-2 flex justify-between items-center">
               <div className="flex items-center gap-8">
                 <Link href={"/"} className="flex gap-4 items-center">
-                  <Image
-                    className="invert"
-                    src="vercel.svg"
-                    alt="Vercel Swag Store Logo"
-                    width={25}
-                    height={25}
-                    priority
-                  />
+                  <div className="relative h-5 w-5">
+                    <Image
+                      className="invert left-0"
+                      src="/vercel.svg"
+                      alt="Vercel Swag Store Logo"
+                      fill
+                    />
+                  </div>
                   <h2 className="text-l font-semibold">Swag Store</h2>
                 </Link>
                 <Suspense

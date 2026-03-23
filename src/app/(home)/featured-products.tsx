@@ -22,7 +22,11 @@ export async function FeaturedProducts() {
       <div className="p-2 grid place-items-stretch h-[30rem]">
         <div className="flex justify-between">
           <h4 className="text-2xl font-bold mb-4">Featured Products</h4>
-          <Link href="/search" className="text-primary hover:underline">
+          <Link
+            href="/search"
+            className="text-primary hover:underline"
+            prefetch
+          >
             See all
           </Link>
         </div>

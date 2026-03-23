@@ -24,7 +24,7 @@ export function SearchFilter({
   const searchParams = useSearchParams();
   const initialSelectedFilter = (categories || []).find(
     (cat) => cat.slug === searchParams.get("category"),
-  )?.slug;
+  )?.name;
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
     initialSelectedFilter || null,
   );
@@ -41,10 +41,11 @@ export function SearchFilter({
       value={selectedCategory}
       onValueChange={(value) => {
         const params = new URLSearchParams(searchParams.toString());
-        if (!value || value === "all") {
+        const foundSlug = categories?.find((c) => c.name === value)?.slug;
+        if (!foundSlug) {
           params.delete("category");
         } else {
-          params.set("category", value);
+          params.set("category", foundSlug || "");
         }
         setSelectedCategory(value);
         router.replace(`?${params.toString()}`);
@@ -55,7 +56,7 @@ export function SearchFilter({
         <ComboboxEmpty>No categories found.</ComboboxEmpty>
         <ComboboxList>
           {(item) => (
-            <ComboboxItem key={item.slug} value={item.slug}>
+            <ComboboxItem key={item.slug} value={item.name}>
               {item.name}
             </ComboboxItem>
           )}
