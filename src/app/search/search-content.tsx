@@ -1,24 +1,8 @@
 /** @format */
 
 import { ProductCard, ProductCardSkeleton } from "@/components/product-card";
-import { ListProductsCategoryEnum, productsApi } from "@/lib/api-client";
-import { cacheLife, cacheTag } from "next/cache";
-
-async function getProducts(
-  search: string,
-  categorySlug?: ListProductsCategoryEnum,
-) {
-  "use cache";
-  if (search === "" && !categorySlug) {
-    cacheLife("hours");
-    cacheTag(`products-all`);
-  }
-  return productsApi.listProducts({
-    search: search ? search : undefined,
-    category: categorySlug,
-    limit: 5,
-  });
-}
+import { ListProductsCategoryEnum } from "@/lib/api-client";
+import { getProducts } from "../_api/getProducts";
 
 export async function SearchContent({
   search,

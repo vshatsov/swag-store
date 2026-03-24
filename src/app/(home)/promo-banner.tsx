@@ -1,16 +1,11 @@
 /** @format */
 
 import { AnimateOnAppear } from "@/components/with-appear-animation";
-import { promoApi } from "@/lib/api-client";
-
-async function fetchPromotionResponse() {
-  const activePromo = await promoApi.getActivePromotion();
-  return activePromo;
-}
+import { fetchPromotionResponse } from "../_api/fetchPromotionResponse";
 
 export async function PromoBanner() {
   const promoResponse = await fetchPromotionResponse();
-  if (!promoResponse.data?.active) {
+  if (!promoResponse.success || !promoResponse.data?.active) {
     return <PromoBannerSkeleton />;
   }
   const promo = promoResponse.data;

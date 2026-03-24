@@ -67,6 +67,7 @@ export default function RootLayout({
                       src="/vercel.svg"
                       alt="Vercel Swag Store Logo"
                       fill
+                      unoptimized
                     />
                   </div>
                   <h2 className="text-l font-semibold">Swag Store</h2>

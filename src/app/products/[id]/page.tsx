@@ -89,7 +89,7 @@ export default async function ProductDetailsPage({
           className="object-contain"
           alt={`Product Details: ${productDetailsData?.slug}`}
           fill
-          priority
+          preload
           sizes="(max-width: 768px) 100vw, 50vw"
           placeholder="empty"
         />

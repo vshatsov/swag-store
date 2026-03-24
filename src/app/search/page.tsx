@@ -1,20 +1,12 @@
 /** @format */
 
 import type { Metadata } from "next";
-import { categoriesApi, ListProductsCategoryEnum } from "@/lib/api-client";
-import { cacheLife, cacheTag } from "next/cache";
+import { ListProductsCategoryEnum } from "@/lib/api-client";
 import { SearchFilter } from "./search-filter";
 import { SearchInput } from "./search-input";
 import { SearchContent, SearchContentSkeleton } from "./search-content";
 import { Suspense } from "react";
-
-async function getAvailableCategories() {
-  "use cache";
-  cacheLife("max");
-  cacheTag("categories");
-  const categoriesResponse = await categoriesApi.listCategories();
-  return categoriesResponse;
-}
+import { getAvailableCategories } from "../_api/getAvailableCategories";
 
 export async function generateMetadata({
   searchParams,
