@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/combobox";
 import { Category } from "@/lib/api-client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useTransition } from "react";
 import { toast } from "sonner";
 
 export function SearchFilter({
@@ -22,12 +22,12 @@ export function SearchFilter({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialSelectedFilter = (categories || []).find(
-    (cat) => cat.slug === searchParams.get("category"),
-  )?.name;
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    initialSelectedFilter || null,
-  );
+  const [isPending, startTransition] = useTransition();
+
+  const selectedCategory =
+    (categories || []).find((cat) => cat.slug === searchParams.get("category"))
+      ?.name || null;
+
   useEffect(() => {
     if (!categories) {
       toast.error("Failed to load categories!");
@@ -37,7 +37,6 @@ export function SearchFilter({
   return (
     <Combobox
       items={[{ slug: "all", name: "All Categories" }, ...(categories || [])]}
-      defaultValue={initialSelectedFilter}
       value={selectedCategory}
       onValueChange={(value) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -47,11 +46,12 @@ export function SearchFilter({
         } else {
           params.set("category", foundSlug || "");
         }
-        setSelectedCategory(value);
-        router.replace(`?${params.toString()}`);
+        startTransition(() => {
+          router.replace(`?${params.toString()}`);
+        });
       }}
     >
-      <ComboboxInput placeholder="Category..." />
+      <ComboboxInput placeholder="Category..." loading={isPending} />
       <ComboboxContent>
         <ComboboxEmpty>No categories found.</ComboboxEmpty>
         <ComboboxList>

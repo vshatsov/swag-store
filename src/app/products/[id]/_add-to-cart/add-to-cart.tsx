@@ -1,18 +1,16 @@
 /** @format */
 
 import { Product, stockApi } from "@/lib/api-client";
-import { cacheLife, cacheTag } from "next/cache";
 import { StockProvider } from "../stock-provider";
 import QuantitySelector from "./quantity-selector";
 import { Stock } from "./stock";
 
 export async function getLiveStock(productId: string) {
-  "use cache";
-  cacheLife("hours");
-  cacheTag(`stock-${productId}`);
-
-  const stockResponse = await stockApi.getProductStock({ id: productId });
-  return stockResponse;
+  try {
+    return await stockApi.getProductStock({ id: productId });
+  } catch {
+    return { success: false, data: undefined };
+  }
 }
 
 export async function AddToCart({
@@ -23,8 +21,8 @@ export async function AddToCart({
   product: Product;
 }) {
   const stockResponse = await getLiveStock(productId);
-  if (!stockResponse.data) {
-    return null;
+  if (!stockResponse.success || !stockResponse.data) {
+    return <AddToCartSkeleton />;
   }
   return (
     <StockProvider initialStock={stockResponse.data}>

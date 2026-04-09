@@ -16,7 +16,8 @@ export default async function Image({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { data: product } = await getProductDetails(id);
+  const productDetails = await getProductDetails(id);
+  const product = productDetails.success ? productDetails.data : undefined;
 
   return new ImageResponse(
     <div
@@ -52,13 +53,31 @@ export default async function Image({
         ) : null}
       </div>
 
-      <img
-        src={product?.images?.[0]}
-        alt={`${product?.name} Product Image`}
-        width="420"
-        height="420"
-        style={{ objectFit: "contain" }}
-      />
+      {product?.images?.[0] ? (
+        <img
+          src={product.images[0]}
+          alt={`${product?.name} Product Image`}
+          width="420"
+          height="420"
+          style={{ objectFit: "contain" }}
+        />
+      ) : (
+        <div
+          style={{
+            width: 420,
+            height: 420,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#f4f4f5",
+            borderRadius: 12,
+            fontSize: 48,
+            color: "#a1a1aa",
+          }}
+        >
+          No Image
+        </div>
+      )}
     </div>,
     size,
   );

@@ -10,13 +10,19 @@ export async function getProducts(
   categorySlug?: ListProductsCategoryEnum,
 ) {
   "use cache";
+  cacheTag(`products`);
   if (search === "" && !categorySlug) {
     cacheLife("hours");
     cacheTag(`products-all`);
   }
-  return productsApi.listProducts({
-    search: search ? search : undefined,
-    category: categorySlug,
-    limit: 5,
-  });
+
+  try {
+    return await productsApi.listProducts({
+      search: search ? search : undefined,
+      category: categorySlug,
+      limit: 5,
+    });
+  } catch {
+    return { success: false, data: [] };
+  }
 }

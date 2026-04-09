@@ -4,7 +4,7 @@
 
 import { DrawerDescription } from "@/components/ui/drawer";
 import { CartItemWithProduct } from "@/lib/api-client";
-import Image from "next/image";
+import { ProductImage } from "@/components/product-image";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { MinusIcon, PlusIcon, Trash2Icon } from "lucide-react";
@@ -54,16 +54,14 @@ function CartItem({
   return (
     <div key={item.productId} className="mb-4">
       <div className="relative h-12 w-full">
-        {!!item.product?.images?.[0] && (
-          <Image
-            src={item.product?.images?.[0]}
-            alt={`${item.product?.name}`}
-            fill
-            placeholder="empty"
-            className="object-contain"
-            quality={50}
-          />
-        )}
+        <ProductImage
+          src={item.product?.images?.[0]}
+          alt={`${item.product?.name}`}
+          fill
+          placeholder="empty"
+          className="object-contain"
+          quality={50}
+        />
       </div>
       <div className="flex items-center justify-between mb-4">
         <div className="flex gap-2">

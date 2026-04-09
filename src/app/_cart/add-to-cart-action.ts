@@ -8,19 +8,25 @@ import { createOrGetCartToken } from "../_api/createOrGetCartToken";
 import { renewCartToken } from "../_api/renewCartToken";
 
 export async function addToCartAction(productId: string, quantity: number) {
-  const { token, cookieStore } = await createOrGetCartToken();
+  const result = await createOrGetCartToken();
 
-  if (token) {
+  if (!result.success) {
+    throw new Error("Failed to create or retrieve cart");
+  }
+
+  try {
     await cartApi.addItemToCart({
-      xCartToken: token,
+      xCartToken: result.token,
       addToCartRequest: {
         productId,
         quantity,
       },
     });
 
-    await renewCartToken(token, cookieStore);
+    await renewCartToken(result.token, result.cookieStore);
+  } catch {
+    throw new Error("Failed to add item to cart");
+  } finally {
+    refresh();
   }
-
-  refresh();
 }

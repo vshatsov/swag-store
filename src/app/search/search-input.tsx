@@ -5,10 +5,12 @@
 import { Input } from "@/components/ui/input";
 import { useDebouncedCallback } from "use-debounce";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTransition } from "react";
 
 export function SearchInput() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
   const triggerSearch = useDebouncedCallback((value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -18,7 +20,9 @@ export function SearchInput() {
       params.set("search", value);
     }
     if (value.length >= 3 || value.length === 0) {
-      router.replace(`?${params.toString()}`);
+      startTransition(() => {
+        router.replace(`?${params.toString()}`);
+      });
     }
   }, 500);
 
@@ -43,6 +47,7 @@ export function SearchInput() {
       defaultValue={searchParams.get("search")?.toString()}
       onChange={handleSearchChange}
       onKeyDown={handleKeyDown}
+      loading={isPending}
     />
   );
 }

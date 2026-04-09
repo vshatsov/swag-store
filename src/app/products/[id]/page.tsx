@@ -2,7 +2,7 @@
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Image from "next/image";
+import { ProductImage } from "@/components/product-image";
 import { Badge } from "@/components/ui/badge";
 import { AddToCart, AddToCartSkeleton } from "./_add-to-cart/add-to-cart";
 import { Suspense } from "react";
@@ -20,7 +20,7 @@ export async function generateMetadata({
   try {
     const productDetails = await getProductDetails(id);
 
-    if (!productDetails.data) {
+    if (!productDetails.success || !productDetails.data) {
       return {
         title: "Product Not Found",
         description: "The product you're looking for could not be found.",
@@ -75,7 +75,7 @@ export default async function ProductDetailsPage({
   const { id } = await params;
   const productDetails = await getProductDetails(id);
 
-  if (!productDetails.data) {
+  if (!productDetails.success || !productDetails.data) {
     return notFound();
   }
 
@@ -84,8 +84,8 @@ export default async function ProductDetailsPage({
   return (
     <div className="p-2 w-full grid md:grid-cols-[1fr_1fr]">
       <div className="h-full w-auto relative">
-        <Image
-          src={productDetailsData?.images?.[0] || ""}
+        <ProductImage
+          src={productDetailsData?.images?.[0]}
           className="object-contain"
           alt={`Product Details: ${productDetailsData?.slug}`}
           fill

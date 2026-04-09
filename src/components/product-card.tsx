@@ -1,12 +1,12 @@
 /** @format */
 
 import { Product } from "@/lib/api-client/generated-api/models/Product";
-import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
 import { centsToDollarsString } from "@/lib/utils";
+import { ProductImage } from "./product-image";
 
 interface ProductCardProps {
   product: Product;
@@ -18,8 +18,8 @@ export async function ProductCard({ product }: ProductCardProps) {
       <CardHeader>
         <Link href={`/products/${product.id}`}>
           <div className="w-full justify-center flex">
-            <Image
-              src={product?.images?.[0] || ""}
+            <ProductImage
+              src={product?.images?.[0]}
               alt={`${product?.name}`}
               className="object-contain"
               width={322}
