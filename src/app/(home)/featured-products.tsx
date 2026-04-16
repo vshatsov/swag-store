@@ -14,8 +14,6 @@ import { AnimateOnAppear } from "@/components/with-appear-animation";
 import { getFeaturedProducts } from "../_api/get-featured-products";
 
 export async function FeaturedProducts() {
-  // throw new Error('This error was triggered intentionally for testing')
-  //await new Promise((resolve) => setTimeout(resolve, 2000));
   const products = await getFeaturedProducts();
   return (
     <AnimateOnAppear duration={500}>
