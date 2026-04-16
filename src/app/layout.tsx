@@ -102,11 +102,7 @@ export default function RootLayout({
                   </div>
                   <h2 className="text-l font-semibold">Swag Store</h2>
                 </Link>
-                <Suspense
-                  fallback={<div className="h-8 w-24 bg-gray-200 rounded" />}
-                >
-                  <LayoutNavigation />
-                </Suspense>
+                <LayoutNavigation />
               </div>
               <Suspense fallback={<CartSkeleton />}>
                 <Cart />
