@@ -7,12 +7,14 @@ import { SearchInput } from "./search-input";
 import { SearchContent, SearchContentSkeleton } from "./search-content";
 import { Suspense } from "react";
 import { getAvailableCategories } from "../_api/get-available-categories";
+import { getSiteUrl } from "@/lib/site-url";
 
 export async function generateMetadata({
   searchParams,
 }: {
   searchParams: Promise<{ search?: string; category?: string }>;
 }): Promise<Metadata> {
+  const siteUrl = getSiteUrl();
   try {
     const { search, category } = await searchParams;
 
@@ -42,7 +44,7 @@ export async function generateMetadata({
         title,
         description,
         type: "website",
-        url: `https://swag-store-gray.vercel.app/search${
+        url: `${siteUrl}/search${
           search || category
             ? `?${[
                 search ? `search=${encodeURIComponent(search)}` : "",

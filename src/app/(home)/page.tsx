@@ -9,8 +9,10 @@ import {
 } from "./featured-products";
 import { Suspense } from "react";
 import { storeApi } from "@/lib/api-client";
+import { getSiteUrl } from "@/lib/site-url";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const siteUrl = getSiteUrl();
   try {
     const storeConfig = await storeApi.getStoreConfig();
     const seoConfig = storeConfig.data?.seo;
@@ -26,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
         description:
           seoConfig?.defaultDescription ||
           "Discover premium branded merchandise at our exclusive swag store.",
-        url: "https://swag-store-gray.vercel.app",
+        url: siteUrl,
         siteName: storeName,
         type: "website",
       },

@@ -9,12 +9,14 @@ import { Suspense } from "react";
 import { centsToDollarsString } from "@/lib/utils";
 import { getFeaturedProducts } from "@/app/_api/get-featured-products";
 import { getProductDetails } from "@/app/_api/get-product-details";
+import { getSiteUrl } from "@/lib/site-url";
 
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
+  const siteUrl = getSiteUrl();
   const { id } = await params;
 
   try {
@@ -40,7 +42,7 @@ export async function generateMetadata({
       openGraph: {
         title: productName,
         description: productDescription,
-        url: `https://swag-store-gray.vercel.app/products/${id}`,
+        url: `${siteUrl}/products/${id}`,
       },
       twitter: {
         card: "summary_large_image",
