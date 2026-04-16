@@ -4,8 +4,8 @@
 
 import { cartApi } from "@/lib/api-client";
 import { refresh } from "next/cache";
-import { createOrGetCartToken } from "../_api/createOrGetCartToken";
-import { renewCartToken } from "../_api/renewCartToken";
+import { createOrGetCartToken } from "../_api/create-or-get-cart-token";
+import { renewCartToken } from "../_api/renew-cart-token";
 
 export async function updateCartItem(productId: string, quantity: number) {
   const result = await createOrGetCartToken();

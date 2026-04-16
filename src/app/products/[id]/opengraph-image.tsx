@@ -1,5 +1,5 @@
 // app/products/[id]/opengraph-image.tsx
-import { getProductDetails } from "@/app/_api/getProductDetails";
+import { getProductDetails } from "@/app/_api/get-product-details";
 import { centsToDollarsString } from "@/lib/utils";
 import { ImageResponse } from "next/og";
 

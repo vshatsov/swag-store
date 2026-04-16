@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { AddToCart, AddToCartSkeleton } from "./_add-to-cart/add-to-cart";
 import { Suspense } from "react";
 import { centsToDollarsString } from "@/lib/utils";
-import { getFeaturedProducts } from "@/app/_api/getFeaturedProducts";
-import { getProductDetails } from "@/app/_api/getProductDetails";
+import { getFeaturedProducts } from "@/app/_api/get-featured-products";
+import { getProductDetails } from "@/app/_api/get-product-details";
 
 export async function generateMetadata({
   params,

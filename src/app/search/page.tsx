@@ -6,7 +6,7 @@ import { SearchFilter } from "./search-filter";
 import { SearchInput } from "./search-input";
 import { SearchContent, SearchContentSkeleton } from "./search-content";
 import { Suspense } from "react";
-import { getAvailableCategories } from "../_api/getAvailableCategories";
+import { getAvailableCategories } from "../_api/get-available-categories";
 
 export async function generateMetadata({
   searchParams,

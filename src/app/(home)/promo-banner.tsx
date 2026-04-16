@@ -1,7 +1,7 @@
 /** @format */
 
 import { AnimateOnAppear } from "@/components/with-appear-animation";
-import { fetchPromotionResponse } from "../_api/fetchPromotionResponse";
+import { fetchPromotionResponse } from "../_api/fetch-promotion-response";
 
 export async function PromoBanner() {
   const promoResponse = await fetchPromotionResponse();

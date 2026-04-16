@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { CartContent } from "./cart-content";
 import { CartInitClient } from "./cart-init-client";
 import { GoToCheckout } from "./go-to-checkout";
-import { getCart } from "../_api/getCart";
+import { getCart } from "../_api/get-cart";
 import { CartBadge } from "./cart-badge";
 
 export async function Cart() {

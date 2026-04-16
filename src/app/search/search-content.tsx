@@ -2,7 +2,7 @@
 
 import { ProductCard, ProductCardSkeleton } from "@/components/product-card";
 import { ListProductsCategoryEnum } from "@/lib/api-client";
-import { getProducts } from "../_api/getProducts";
+import { getProducts } from "../_api/get-products";
 
 export async function SearchContent({
   search,

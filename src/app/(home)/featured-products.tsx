@@ -11,7 +11,7 @@ import { ProductCard, ProductCardSkeleton } from "@/components/product-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { AnimateOnAppear } from "@/components/with-appear-animation";
-import { getFeaturedProducts } from "../_api/getFeaturedProducts";
+import { getFeaturedProducts } from "../_api/get-featured-products";
 
 export async function FeaturedProducts() {
   // throw new Error('This error was triggered intentionally for testing')
