@@ -12,14 +12,14 @@ import LayoutNavigation from "./layout-navigation";
 import { Suspense } from "react";
 import { Cart, CartSkeleton } from "./_cart/cart";
 import { CartProvider } from "./_cart/cart-provider";
-import { storeApi } from "@/lib/api-client";
 import { Toaster } from "@/components/ui/sonner";
 import { getSiteUrl } from "@/lib/site-url";
+import { getStoreConfig } from "./_api/get-store-config";
 
 export async function generateMetadata(): Promise<Metadata> {
   const siteUrl = getSiteUrl();
   try {
-    const storeConfig = await storeApi.getStoreConfig();
+    const storeConfig = await getStoreConfig();
     const seoConfig = storeConfig.data?.seo;
     const storeName = storeConfig.data?.storeName || "Swag Store";
     const description =
