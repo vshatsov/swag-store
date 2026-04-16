@@ -2,7 +2,7 @@
 
 "use client";
 
-import { ComponentType, ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 export type AnimateOnAppearOptions = {
   delay?: number;
@@ -38,23 +38,3 @@ export function AnimateOnAppear({
   );
 }
 
-export function withAppearAnimation<P extends object>(
-  WrappedComponent: ComponentType<P>,
-) {
-  return function WithAppearAnimation(
-    props: P & Omit<AnimateOnAppearOptions, "children">,
-  ) {
-    const {
-      delay = 0,
-      duration = 300,
-      className = "",
-      ...rest
-    } = props as P & Omit<AnimateOnAppearOptions, "children">;
-
-    return (
-      <AnimateOnAppear delay={delay} duration={duration} className={className}>
-        <WrappedComponent {...(rest as P)} />
-      </AnimateOnAppear>
-    );
-  };
-}
