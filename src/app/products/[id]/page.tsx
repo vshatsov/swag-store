@@ -107,7 +107,7 @@ export default async function ProductDetailsPage({
             </div>
             <p>{productDetailsData?.description}</p>
             <p className="text-secondary">
-              {centsToDollarsString(productDetailsData?.price || 0)} $
+              {centsToDollarsString(productDetailsData?.price || 0)}
             </p>
             <Suspense fallback={<AddToCartSkeleton />}>
               <AddToCart productId={id} product={productDetails.data} />

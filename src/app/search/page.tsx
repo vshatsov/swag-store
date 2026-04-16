@@ -97,7 +97,7 @@ export default async function Search({
         <SearchFilter categories={categoriesResponse.data} />
       </div>
       <Suspense
-        key={`${search}-${categoryString}}`}
+        key={`${search}-${categoryString}`}
         fallback={<SearchContentSkeleton />}
       >
         <SearchContent search={search || ""} category={category} />

@@ -31,7 +31,7 @@ export function CartContent() {
           ))}
           <div className="flex justify-end mt-4">
             <p className="text-lg font-semibold">
-              Total: {centsToDollarsString(optimisticCartData?.subtotal || 0)} $
+              Total: {centsToDollarsString(optimisticCartData?.subtotal || 0)}
             </p>
           </div>
         </div>
@@ -112,7 +112,7 @@ function CartItem({
           </div>
         </div>
         <p className="font-medium">
-          {centsToDollarsString(item.product?.price || 0)}$
+          {centsToDollarsString(item.product?.price || 0)}
         </p>
       </div>
     </div>
