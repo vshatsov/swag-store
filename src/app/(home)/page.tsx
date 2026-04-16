@@ -1,6 +1,5 @@
 /** @format */
 
-import type { Metadata } from "next";
 import { HeroSection } from "./hero-section";
 import { PromoBanner, PromoBannerSkeleton } from "./promo-banner";
 import {
@@ -8,47 +7,6 @@ import {
   FeaturedProductsSkeleton,
 } from "./featured-products";
 import { Suspense } from "react";
-import { storeApi } from "@/lib/api-client";
-import { getSiteUrl } from "@/lib/site-url";
-
-export async function generateMetadata(): Promise<Metadata> {
-  const siteUrl = getSiteUrl();
-  try {
-    const storeConfig = await storeApi.getStoreConfig();
-    const seoConfig = storeConfig.data?.seo;
-    const storeName = storeConfig.data?.storeName || "Swag Store";
-
-    return {
-      title: seoConfig?.defaultTitle || storeName,
-      description:
-        seoConfig?.defaultDescription ||
-        "Discover premium branded merchandise at our exclusive swag store.",
-      openGraph: {
-        title: seoConfig?.defaultTitle || storeName,
-        description:
-          seoConfig?.defaultDescription ||
-          "Discover premium branded merchandise at our exclusive swag store.",
-        url: siteUrl,
-        siteName: storeName,
-        type: "website",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: seoConfig?.defaultTitle || storeName,
-        description:
-          seoConfig?.defaultDescription ||
-          "Discover premium branded merchandise at our exclusive swag store.",
-      },
-    };
-  } catch (error) {
-    console.error("Failed to fetch store config for metadata:", error);
-    return {
-      title: "Swag Store",
-      description:
-        "Discover premium branded merchandise at our exclusive swag store.",
-    };
-  }
-}
 
 export default function Home() {
   return (

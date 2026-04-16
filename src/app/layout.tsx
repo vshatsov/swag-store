@@ -14,21 +14,37 @@ import { Cart, CartSkeleton } from "./_cart/cart";
 import { CartProvider } from "./_cart/cart-provider";
 import { storeApi } from "@/lib/api-client";
 import { Toaster } from "@/components/ui/sonner";
+import { getSiteUrl } from "@/lib/site-url";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const siteUrl = getSiteUrl();
   try {
     const storeConfig = await storeApi.getStoreConfig();
     const seoConfig = storeConfig.data?.seo;
     const storeName = storeConfig.data?.storeName || "Swag Store";
+    const description =
+      seoConfig?.defaultDescription ||
+      "Discover premium branded merchandise at our exclusive swag store.";
+    const title = seoConfig?.defaultTitle || storeName;
 
     return {
       title: {
         template: seoConfig?.titleTemplate || "%s | Swag Store",
         default: seoConfig?.defaultTitle || storeName,
       },
-      description:
-        seoConfig?.defaultDescription ||
-        "Discover premium branded merchandise at our exclusive swag store.",
+      description,
+      openGraph: {
+        title,
+        description,
+        url: siteUrl,
+        siteName: storeName,
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+      },
       icons: {
         icon: "/favicon.ico",
       },
@@ -42,6 +58,20 @@ export async function generateMetadata(): Promise<Metadata> {
       },
       description:
         "Discover premium branded merchandise at our exclusive swag store.",
+      openGraph: {
+        title: "Swag Store",
+        description:
+          "Discover premium branded merchandise at our exclusive swag store.",
+        url: siteUrl,
+        siteName: "Swag Store",
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "Swag Store",
+        description:
+          "Discover premium branded merchandise at our exclusive swag store.",
+      },
     };
   }
 }
