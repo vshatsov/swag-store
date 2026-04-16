@@ -27,7 +27,7 @@ export async function HeroSection() {
           represent the tools you love!
         </p>
         <Button size="xxl" className="px-32 w-full md:w-fit" asChild>
-          <Link href="/search" prefetch>
+          <Link href="/search">
             Browse All Products <ArrowRight />
           </Link>
         </Button>

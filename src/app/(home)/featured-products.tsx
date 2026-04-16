@@ -23,7 +23,6 @@ export async function FeaturedProducts() {
           <Link
             href="/search"
             className="text-primary hover:underline"
-            prefetch
           >
             See all
           </Link>
