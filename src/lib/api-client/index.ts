@@ -9,14 +9,15 @@ import {
   CategoriesApi,
   StoreApi,
 } from "./generated-api";
+import { env } from "@/lib/env";
 
-const bypass = process.env.X_VERCEL_PROTECTION_BYPASS;
-const apiBaseUrl = process.env.API_BASE_URL?.replace(/\/+$/, "");
+const bypass = env.X_VERCEL_PROTECTION_BYPASS;
+const apiBaseUrl = env.API_BASE_URL?.replace(/\/+$/, "");
 
 const config = new Configuration({
   ...(apiBaseUrl ? { basePath: apiBaseUrl } : {}),
   headers: {
-    "x-vercel-protection-bypass": `${bypass}`,
+    ...(bypass ? { "x-vercel-protection-bypass": bypass } : {}),
   },
 });
 

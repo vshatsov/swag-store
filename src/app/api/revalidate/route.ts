@@ -2,8 +2,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
+import { env } from "@/lib/env";
 
-const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET;
+const REVALIDATE_SECRET = env.REVALIDATE_SECRET;
 
 type RevalidateBody =
   | { tag: string; tags?: undefined }
