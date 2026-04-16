@@ -63,10 +63,23 @@ export async function generateMetadata({
     };
   } catch (error) {
     console.error("Failed to generate search metadata:", error);
+    const title = "Search Products";
+    const description =
+      "Search and discover premium branded merchandise at our exclusive swag store.";
     return {
-      title: "Search Products",
-      description:
-        "Search and discover premium branded merchandise at our exclusive swag store.",
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        type: "website",
+        url: `${siteUrl}/search`,
+      },
+      twitter: {
+        card: "summary",
+        title,
+        description,
+      },
     };
   }
 }

@@ -35,6 +35,7 @@ export async function generateMetadata({
       product?.description ||
       "Discover this exclusive product from our swag store.";
     const productImage = product?.images?.[0] || "";
+    const ogImages = productImage ? [productImage] : [];
 
     return {
       title: productName,
@@ -43,12 +44,14 @@ export async function generateMetadata({
         title: productName,
         description: productDescription,
         url: `${siteUrl}/products/${id}`,
+        type: "website",
+        ...(ogImages.length > 0 ? { images: ogImages } : {}),
       },
       twitter: {
-        card: "summary_large_image",
+        card: ogImages.length > 0 ? "summary_large_image" : "summary",
         title: productName,
         description: productDescription,
-        images: productImage ? [productImage] : [],
+        ...(ogImages.length > 0 ? { images: ogImages } : {}),
       },
     };
   } catch (error) {

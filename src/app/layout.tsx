@@ -18,6 +18,7 @@ import { getStoreConfig } from "./_api/get-store-config";
 
 export async function generateMetadata(): Promise<Metadata> {
   const siteUrl = getSiteUrl();
+  const metadataBase = new URL(siteUrl);
   try {
     const storeConfig = await getStoreConfig();
     const seoConfig = storeConfig.data?.seo;
@@ -28,6 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const title = seoConfig?.defaultTitle || storeName;
 
     return {
+      metadataBase,
       title: {
         template: seoConfig?.titleTemplate || "%s | Swag Store",
         default: seoConfig?.defaultTitle || storeName,
@@ -41,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
         type: "website",
       },
       twitter: {
-        card: "summary_large_image",
+        card: "summary",
         title,
         description,
       },
@@ -52,6 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
   } catch (error) {
     console.error("Failed to fetch store config for metadata:", error);
     return {
+      metadataBase,
       title: {
         template: "%s | Swag Store",
         default: "Swag Store",
@@ -67,7 +70,7 @@ export async function generateMetadata(): Promise<Metadata> {
         type: "website",
       },
       twitter: {
-        card: "summary_large_image",
+        card: "summary",
         title: "Swag Store",
         description:
           "Discover premium branded merchandise at our exclusive swag store.",
